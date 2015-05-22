@@ -2,7 +2,7 @@ This script will attach the latest commit message to a jira issue.
   it will also create links to Linaro bug and review systems
   and it will log work (and attach the commit message in the work log as well)
 
-usage: ./jira-log.py LAVA-2105
+sample usage: ./jira-log.py LAVA-2105
 
 and the most recent commit message is: 
    This is a new commit message
