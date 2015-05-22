@@ -1,0 +1,33 @@
+This script will attach the latest commit message to a jira issue.
+  it will also create links to Linaro bug and review systems
+  and it will log work (and attach the commit message in the work log as well)
+
+
+commit message: 
+   This is a new commit message
+      The bug it fixes is bug #[3222|https://bugs.linaro.org/show_bug.cgi?id=3222]
+      The code is reviewed in review #[112|https://review.linaro.org/#/c/112]
+      log #2h on wednesday
+      log #5h on thursday
+    This is related to LAVA-232
+
+Will be stored in Jira
+   This is a new commit message
+      The bug it fixes is bug #[3222|https://bugs.linaro.org/show_bug.cgi?id=3222]
+      The code is reviewed in review #[112|https://review.linaro.org/#/c/112]
+      log #2h on wednesday
+      log #5h on thursday
+    This is related to LAVA-232
+
+and 
+  2 work logs will be created
+    1 for 2 hours
+    1 for 5 hours
+
+Format for link replacement
+  bug #1234  will create a link in jira to bugzilla
+  review #1234 will create a link in jira to review.l.o
+
+Format for work logs
+  log #4d will log 4 days (32 hours) to the issue
+
