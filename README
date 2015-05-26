@@ -1,41 +1,28 @@
-This script will attach the latest commit message to a jira issue.
-  it will also create links to Linaro bug and review systems
-  and it will log work (and attach the commit message in the work log as well)
+  The tool will always display 'In Progress' cards so you don't have to use the GUI
+  (you can also optionally show all your cards or insert a custom query)
 
-sample usage: ./jira-log.py LAVA-2105
+  The provided comment will be parsed for a few internal strings
+     bug #1234  --> creates a jira mark-up link to bugzilla.linaro.org
+     review #34  --> creates a jira mark-up link to review.linaro.org
+     log #1h  --> the tool will log 1 hour to the Card
 
-and the most recent commit message is: 
-   This is a new commit message
-      The bug it fixes is bug #3222
-      The code is reviewed in review #112
-      log #2h on wednesday
-      log #5h on thursday
-    This is related to LAVA-232
+  The target card to log work to and/or comment can be specified on the command line
+  and/or parsed out of the local most-recent git commit message
 
-Will be stored in Jira:
-commit e7d345da5687a387df26f9485d22b51b4ce05a9c
-Author: Alan Bennett <alan.bennett@linaro.org>
-Date:   Thu May 21 16:21:24 2015 -0600
+usage: jira-log.py [-h] [--user USER] [--inprogress] [--allmycards]
+                   [--query QUERY] [--card CARD] [--comment COMMENT]
+                   [--hours HOURS] [--debug]
 
-   This is a new commit message
-      The bug it fixes is bug #[3222|https://bugs.linaro.org/show_bug.cgi?id=3222]
-      The code is reviewed in review #[112|https://review.linaro.org/#/c/112]
-      log #2h on wednesday
-      log #5h on last thursday
-    This is related to LAVA-232
+This is a simple tool for logging work hours and adding comments to cards
 
-AND
-
-  2 work logs will be created
-    1 for 2 hours
-    1 for 5 hours
-
-=====
-Format for link replacement
-  bug #1234      - will create a link in jira to bugzilla
-  review #1234   - will create a link in jira to review.l.o
-
-Format for work logs
-  log #4d        - will log 4 days (32 hours) to the issue
-  log #1h        - will log 1 h to the issue
+optional arguments:
+  -h, --help         show this help message and exit
+  --user USER        Override the user in the queries
+  --inprogress       Display only inprogress cards
+  --allmycards       Display all cards
+  --query QUERY      Display cards from custom Jira query
+  --card CARD        Issue # you wish to add a comment to and/or log hours
+  --comment COMMENT  Comment to be added to the CARD
+  --hours HOURS      log hours to the specified card
+  --debug
 
