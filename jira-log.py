@@ -55,14 +55,14 @@ def setup_args_parser():
         "  and/or parsed out of the local most-recent git commit message\n"
     description = "This is a simple tool for logging work hours and adding comments to cards"
     parser = argparse.ArgumentParser(description=description)
-    parser.add_argument("--user", required=False, help="Override the user in the queries")
+    parser.add_argument("--user", "-u", required=False, help="Override the user in the queries")
     parser.add_argument("--inprogress", action="store_true", help="Display only inprogress cards")
     parser.add_argument("--allmycards", action="store_true", help="Display all cards")
-    parser.add_argument("--query", required=False, help="Display cards from custom Jira query")
-    parser.add_argument("--card", help="Issue # you wish to add a comment to and/or log hours")
-    parser.add_argument("--comment", required=False, help="Comment to be added to the CARD")
-    parser.add_argument("--hours", help="log hours to the specified card")
-    parser.add_argument("--debug", action="store_true")
+    parser.add_argument("--query", "-q", required=False, help="Display cards from custom Jira query")
+    parser.add_argument("--issue", "-i", help="Issue # you wish to add a comment to and/or log hours")
+    parser.add_argument("--comment", "-c", required=False, help="Comment to be added to the CARD")
+    parser.add_argument("--hours", "-hour", help="log hours to the specified card")
+    parser.add_argument("--debug", "-d", action="store_true")
 
     return parser.parse_args()
 
@@ -86,7 +86,7 @@ def main():
     if args.user is not None:
         query_username = args.user
     else:
-        query_username = get_jira_cached_user()
+        query_username = git_config_get("user.email")
 
     if args.query is not None:
         query = args.query
@@ -98,8 +98,8 @@ def main():
         query = ('assignee="%s" and status in ("In Progress")' % query_username)
         jira_query_cards(jira_soap_client, jira_auth, query)
 
-    if args.card is not None:
-        card = args.card
+    if args.issue is not None:
+        card = args.issue
         logging.debug("CARD (passed in): " + str(card))
     else:
         # check to see if the commit message in the local git repository contains a card reference
@@ -210,7 +210,6 @@ def jira_start_session(jira_url):
 
     except Exception, e:
         save_jira_cached_auth(jira_url)
-        save_jira_cached_user(jira_url)
         logging.error("Invalid Jira URL: '%s'", jira_url)
         logging.debug(e)
         return -1
@@ -277,8 +276,11 @@ def jira_explicit_login(soap_client):
         # http://mail.python.org/pipermail/patches/2002-February/007193.html
 #        sys.stdin = open('/dev/tty', 'r')
 
-        username = raw_input('Jira username: ')
-        save_jira_cached_user(username)
+        username = git_config_get("user.email")
+        if username == '':
+            username = raw_input('Jira username: ')
+        else:
+            print "User from git: ", username
         password = getpass.getpass('Jira password: ')
 
         # print "abc"
@@ -336,14 +338,6 @@ def get_jira_cached_auth():
 
 def save_jira_cached_auth(auth):
     return save_cfg_value(os.environ['HOME'] + "/.jirarc", "General", "auth", auth)
-
-
-def get_jira_cached_user():
-    return get_cfg_value(os.environ['HOME'] + "/.jirarc", "General", "email")
-
-
-def save_jira_cached_user(userlogin):
-    return save_cfg_value(os.environ['HOME'] + "/.jirarc", "General", "email", userlogin)
 
 
 # ---------------------------------------------------------------------

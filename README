@@ -1,3 +1,8 @@
+Dependency: SOAPpy
+
+================
+$./jira-log.py --help
+
   The tool will always display 'In Progress' cards so you don't have to use the GUI
   (you can also optionally show all your cards or insert a custom query)
 
@@ -10,19 +15,22 @@
   and/or parsed out of the local most-recent git commit message
 
 usage: jira-log.py [-h] [--user USER] [--inprogress] [--allmycards]
-                   [--query QUERY] [--card CARD] [--comment COMMENT]
+                   [--query QUERY] [--issue ISSUE] [--comment COMMENT]
                    [--hours HOURS] [--debug]
 
 This is a simple tool for logging work hours and adding comments to cards
 
 optional arguments:
-  -h, --help         show this help message and exit
-  --user USER        Override the user in the queries
-  --inprogress       Display only inprogress cards
-  --allmycards       Display all cards
-  --query QUERY      Display cards from custom Jira query
-  --card CARD        Issue # you wish to add a comment to and/or log hours
-  --comment COMMENT  Comment to be added to the CARD
-  --hours HOURS      log hours to the specified card
-  --debug
-
+  -h, --help            show this help message and exit
+  --user USER, -u USER  Override the user in the queries
+  --inprogress          Display only inprogress cards
+  --allmycards          Display all cards
+  --query QUERY, -q QUERY
+                        Display cards from custom Jira query
+  --issue ISSUE, -i ISSUE
+                        Issue # you wish to add a comment to and/or log hours
+  --comment COMMENT, -c COMMENT
+                        Comment to be added to the CARD
+  --hours HOURS, -hour HOURS
+                        log hours to the specified card
+  --debug, -d
