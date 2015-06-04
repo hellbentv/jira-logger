@@ -1,7 +1,7 @@
 
 # jira-logger.py
 
-A custom jira tool for managing CARDS within Linaro
+A custom jira tool for managing jira issues
 
 # Prerequisites
 
@@ -19,13 +19,13 @@ Run Help
     Common Commands
     ===============
      Show me the available epics / engineering cards
-        ./jira-logger.py --epic
+        ./jira-log.py --epic
      Add a comment and log 3 hours of work
-        ./jira-logger.py --issue LAVA-1608 --comment 'more work' --hours 3
+        ./jira-log.py --issue LAVA-1608 --comment 'more work' --hours 3
      Create a new sub-task card under Blueprint LAVA-1590
-        ./jira-logger.py --createsubtask LAVA-1590 'New task research'
+        ./jira-log.py --createsubtask LAVA-1590 'New task research'
      Create a new blueprint under epic LAVA-1608
-        ./jira-logger.py --createblueprint LAVA-1608 'New task research'
+        ./jira-log.py --createblueprint LAVA-1608 'New task research'
     
     usage: jira-log.py [-h] [--user USER] [--inprogress] [--allmycards]
                        [--epics EPICS]
@@ -58,9 +58,9 @@ Run Help
 
 # Credentials
 
-Credentials are stored in a plain-text config file in `~/.jira-logger.rc` with `600` permissions, so they can only be read by you (similar to the approach that the `svn` command line client takes).
+Credentials are stored in a plain-text config file in `~/.jira-log.rc` with `600` permissions, so they can only be read by you (similar to the approach that the `svn` command line client takes).
 
-If you need to change the credentials or API details, just remove the `~/.jira-logger.rc` file and next time you run a query you will be prompted to update it.
+If you need to change the credentials or API details, just remove the `~/.jira-log.rc` file and next time you run a query you will be prompted to update it.
 
 If you need to connect to multiple jira instances, it's probably easiest just to copy the cloned repo to another directory and run the second copy with your different credentials.
 
