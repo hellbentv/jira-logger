@@ -1,4 +1,4 @@
-__author__ = 'akbennett'
+#configure.py from: https://github.com/pranavraja/jira-py
 from ConfigParser import RawConfigParser
 import os
 import getpass
