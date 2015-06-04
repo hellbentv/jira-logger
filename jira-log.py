@@ -106,7 +106,6 @@ def main():
     else:
         query_username = jira_user
 
-
     if args.query is not None:
         query = args.query
         jira_query_cards(jira, query)
@@ -290,6 +289,158 @@ def check_commit_for_card(text):
         issuekey = match.group().split(" ", 2)[1].strip('#')
         break
     return issuekey
+
+
+# -----------------------------------------------------------------------------
+# Jira helper functions
+#
+
+# Given a Jira server URL (which is stored in git config)
+# Starts an authenticated jira session using SOAP api
+# Returns a list of the SOAP object and the authentication token
+def jira_start_session(jira_url):
+    jira_url = jira_url.rstrip("/")
+    soap_client = None
+    try:
+        handle = urllib2.urlopen(jira_url + "/rpc/soap/jirasoapservice-v2?wsdl")
+        soap_client = SOAPpy.WSDL.Proxy(handle)
+        # print "self.soap_client set", self.soap_client
+
+    except KeyboardInterrupt:
+        logging.info("... interrupted")
+
+    except Exception, e:
+        save_jira_cached_auth(jira_url)
+        logging.error("Invalid Jira URL: '%s'", jira_url)
+        logging.debug(e)
+        return -1
+
+    auth = jira_login(soap_client)
+    if auth is None:
+        return None, None
+
+    return soap_client, auth
+
+
+# Try to use the cached authentication object to log in
+# to Jira first. ("implicit")
+# if that fails, then prompt the user ("explicit")
+# for username/password
+def jira_login(soap_client):
+
+    auth = get_jira_cached_auth()
+    if auth is not None and auth != "":
+        auth = jira_implicit_login(soap_client, auth)
+    else:
+        auth = None
+
+    if auth is None:
+        save_jira_cached_auth("")
+        auth = jira_explicit_login(soap_client)
+
+    if auth is not None:
+        save_jira_cached_auth(auth)
+
+    return auth
+
+
+def jira_implicit_login(soap_client, auth):
+
+    # test jira to see if auth is valid
+    try:
+        jira_types = soap_client.getIssueTypes(auth)
+        return auth
+    except KeyboardInterrupt:
+        logging.info("... interrupted")
+
+    except Exception, e:
+        print >> sys.stderr, "Previous Jira login is invalid or has expired"
+        # logging.debug(e)
+
+    return None
+
+
+def jira_explicit_login(soap_client):
+    max_retry_count = 3
+    retry_count = 0
+    auth = None
+    while retry_count < max_retry_count:
+        if retry_count > 0:
+            logging.info("Invalid Jira password/username combination, try again")
+
+        # We now need to read the Jira username/password from
+        # the console.
+        # However, there is a problem. When git hooks are invoked
+        # stdin is pointed to /dev/null, see here:
+        # http://kerneltrap.org/index.php?q=mailarchive/git/2008/3/4/1062624/thread
+        # The work-around is to re-assign stdin back to /dev/tty , as per
+        # http://mail.python.org/pipermail/patches/2002-February/007193.html
+#        sys.stdin = open('/dev/tty', 'r')
+
+        username = git_config_get("user.email")
+        if username == '':
+            username = raw_input('Jira username: ')
+        else:
+            print "User from git: ", username
+        password = getpass.getpass('Jira password: ')
+
+        # print "abc"
+        # print "self.soap_client login...%s " % username + password
+        try:
+            auth = soap_client.login(username, password)
+
+            try:
+                jira_types = soap_client.getIssueTypes(auth)
+                return auth
+
+            except KeyboardInterrupt:
+                logging.info("... interrupted")
+
+            except Exception, e:
+                logging.error("User '%s' does not have access to Jira issues")
+                return None
+
+        except KeyboardInterrupt:
+            logging.info("... interrupted")
+
+        except Exception, e:
+            logging.debug("Login failed")
+
+        auth = None
+        retry_count += 1
+
+    if auth is None:
+        logging.error("Invalid Jira password/username combination")
+
+    return auth
+
+
+def jira_find_issue(issuekey, jira_soap_client, jira_auth, jira_text):
+    try:
+        issue = jira_soap_client.getIssue(jira_auth, issuekey)
+        logging.debug("Found issue '%s' in Jira: (%s)", issuekey, issue["summary"])
+        return 0
+
+    except KeyboardInterrupt:
+        logging.info("... interrupted")
+
+    except Exception, e:
+        logging.error("No such issue '%s' in Jira", issuekey)
+        logging.debug(e)
+        return -1
+
+
+# -----------------------------------------------------------------------------
+# Miscellaneous Jira related utility functions
+#
+def get_jira_cached_auth():
+    return get_cfg_value(os.environ['HOME'] + "/.jirarc", "General", "auth")
+
+
+def save_jira_cached_auth(auth):
+    return save_cfg_value(os.environ['HOME'] + "/.jirarc", "General", "auth", auth)
+
+
 
 # ---------------------------------------------------------------------
 # Misc. helper functions
