@@ -18,21 +18,21 @@ Run Help
     $ ./jira-log.py --help
     Common Commands
     ===============
-     Show me the available epics / engineering cards
-        ./jira-log.py --epic
+     Show me the available epics / engineering cards for LAVA
+        ./jira-log.py --epics LAVA
      Add a comment and log 3 hours of work
         ./jira-log.py --issue LAVA-1608 --comment 'more work' --hours 3
      Create a new sub-task card under Blueprint LAVA-1590
-        ./jira-log.py --createsubtask LAVA-1590 'New task research'
+        ./jira-log.py --createsubtask LAVA-1590 'Bug 3232'
      Create a new blueprint under epic LAVA-1608
-        ./jira-log.py --createblueprint LAVA-1608 'New task research'
+        ./jira-log.py --createblueprint LAVA-1608 'Implement feature X'
     
     usage: jira-log.py [-h] [--user USER] [--inprogress] [--allmycards]
                        [--epics EPICS]
                        [--createsubtask CREATESUBTASK CREATESUBTASK]
                        [--createblueprint CREATEBLUEPRINT CREATEBLUEPRINT]
                        [--query QUERY] [--issue ISSUE] [--comment COMMENT]
-                       [--hours HOURS] [--debug]
+                       [--hours HOURS] [--debug] [--browse]
     
     This is a simple tool for logging work hours and adding comments to cards
     
@@ -41,7 +41,7 @@ Run Help
       --user USER, -u USER  Override the user in the queries
       --inprogress          Display only inprogress cards
       --allmycards          Display all cards
-      --epics EPICS         Display all project Epics
+      --epics EPICS         Display all project Epics for a project
       --createsubtask CREATESUBTASK CREATESUBTASK
                             [blueprint id] ['Summary string']
       --createblueprint CREATEBLUEPRINT CREATEBLUEPRINT
@@ -55,6 +55,7 @@ Run Help
       --hours HOURS, -hour HOURS
                             log hours to the specified card
       --debug, -d
+      --browse, -b          launch browser (requires --issue)
 
 # Credentials
 

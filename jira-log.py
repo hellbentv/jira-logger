@@ -7,6 +7,7 @@ from jira.client import JIRA
 import logging
 import subprocess
 import re
+import webbrowser
 
 conf_file = "~/.jira-log.rc"
 DEFAULT_LOGGER_NAME = "cardwalk.log"
@@ -54,8 +55,8 @@ def setup_args_parser():
     """
     print "Common Commands\n"\
           "===============\n"\
-          " Show me the available epics / engineering cards\n"\
-          "    ./jira-log.py --epic\n"\
+          " Show me the available epics / engineering cards for LAVA\n"\
+          "    ./jira-log.py --epics LAVA\n"\
           " Add a comment and log 3 hours of work\n"\
           "    ./jira-log.py --issue LAVA-1608 --comment 'more work' --hours 3\n"\
           " Create a new sub-task card under Blueprint LAVA-1590\n"\
@@ -69,7 +70,7 @@ def setup_args_parser():
     parser.add_argument("--user", "-u", required=False, help="Override the user in the queries")
     parser.add_argument("--inprogress", action="store_true", help="Display only inprogress cards")
     parser.add_argument("--allmycards", action="store_true", help="Display all cards")
-    parser.add_argument("--epics", required=False, help="Display all project Epics")
+    parser.add_argument("--epics", required=False, help="Display all project Epics for a project")
     parser.add_argument("--createsubtask", nargs=2, required=False, help="[blueprint id] ['Summary string']")
     parser.add_argument("--createblueprint", nargs=2, required=False, help="[epic id] ['Summary String']")
     parser.add_argument("--query", "-q", required=False, help="Display cards from custom Jira query")
@@ -77,6 +78,7 @@ def setup_args_parser():
     parser.add_argument("--comment", "-c", required=False, help="Comment to be added to the CARD")
     parser.add_argument("--hours", "-hour", help="log hours to the specified card")
     parser.add_argument("--debug", "-d", action="store_true")
+    parser.add_argument("--browse", "-b", action="store_true", help="launch browser (requires --issue)")
 
     return parser.parse_args()
 
@@ -151,6 +153,8 @@ def main():
             msg_text = fixup_add_jira_url(msg_text, 'review', get_review_url())
             jira_log_work(jira, card, msg_text)
             jira_add_comment_to_issue(jira, card, msg_text)
+        if args.browse is not None:
+            webbrowser.open('https://%s/browse/%s' % (jira_server, card))
     return
 
 
